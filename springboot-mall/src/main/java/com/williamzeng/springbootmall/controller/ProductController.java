@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
     @Autowired
     private ProductService productService;
+
     @GetMapping("/products/{productId}")
     public ResponseEntity<Product> getProduct(@PathVariable Integer productId) {
-
+        System.out.println("ProductController.getProduct");
         Product product = productService.getProductById(productId);
         //判斷productId是否存在於列表當中，且依照判斷回傳http狀態碼
         if (product != null) {

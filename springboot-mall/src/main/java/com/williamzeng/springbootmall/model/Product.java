@@ -1,5 +1,7 @@
 package com.williamzeng.springbootmall.model;
 
+import com.williamzeng.springbootmall.constant.ProductCategory;
+
 import java.util.Date;
 
 public class Product {
@@ -7,7 +9,7 @@ public class Product {
 
     private Integer ProductId;
     private String ProductName;
-    private String Category;
+    private ProductCategory Category;   //單純用String宣告Category無法得知商品的分類
     private String ImageUrl;
     private Integer Price;
     private Integer Stock;
@@ -31,11 +33,11 @@ public class Product {
         ProductName = productName;
     }
 
-    public String getCategory() {
+    public ProductCategory getCategory() {
         return Category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(ProductCategory category) {
         Category = category;
     }
 
