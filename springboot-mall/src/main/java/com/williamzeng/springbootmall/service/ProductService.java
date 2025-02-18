@@ -9,5 +9,7 @@ public interface ProductService {
 
     Integer createProduct(ProductRequest productRequest);
 
+    void updatedProduct(Integer productId, ProductRequest productRequest);
+
 
 }
