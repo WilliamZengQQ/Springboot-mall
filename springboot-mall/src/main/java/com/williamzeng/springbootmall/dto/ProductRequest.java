@@ -4,7 +4,7 @@ import com.williamzeng.springbootmall.constant.ProductCategory;
 import jakarta.validation.constraints.NotNull;
 
 
-public class ProdustRequest {//下方定義前端要回傳的參數以及處理方法等
+public class ProductRequest{//下方定義前端要回傳的參數以及處理方法等
 
     //private Integer ProductId;  因為ProductId是mysql自動定義的毋需前端傳入
     @NotNull

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.williamzeng.springbootmall.dto.ProdustRequest;
+import com.williamzeng.springbootmall.dto.ProductRequest;
 
 @RestController
 public class ProductController {
@@ -29,11 +29,11 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<Product> createProduct(@RequestBody @Valid  ProdustRequest productRequest){
+    public ResponseEntity<Product> createProduct(@RequestBody @Valid  ProductRequest productRequest){
         Integer productId =  productService.createProduct(productRequest); //要從資料庫當中返回ProductId給我們
 
         Product product = productService.getProductById(productId);
-        System.out.println("ProductController.createProduct");
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 }
