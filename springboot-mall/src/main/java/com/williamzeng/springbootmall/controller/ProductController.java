@@ -53,4 +53,13 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.OK).body(updataedproduct);
         }
     }
+
+    @DeleteMapping("/products/{productId}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Integer productId){
+
+        productService.deleteProductById(productId); //刪除後不用返回什麼數值
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); //顯示出數據已經進行刪除
+
+    }
 }
