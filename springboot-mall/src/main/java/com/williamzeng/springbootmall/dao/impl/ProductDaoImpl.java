@@ -1,5 +1,6 @@
 package com.williamzeng.springbootmall.dao.impl;
 
+import com.williamzeng.springbootmall.constant.ProductCategory;
 import com.williamzeng.springbootmall.dao.ProductDao;
 import com.williamzeng.springbootmall.dto.ProductRequest;
 import com.williamzeng.springbootmall.model.Product;
@@ -23,10 +24,19 @@ public class ProductDaoImpl implements ProductDao {
     NamedParameterJdbcTemplate namedParameterJdbcTemplate; //將NamedParameterJdbcTemplate注入進來引用這個類當中的function
 
     @Override
-    public List<Product> getProducts(){
+    public List<Product> getProducts(ProductCategory productCategory,String search){
         String sql = "SELECT product_id, product_name, " +
-                "category, image_url, price, stock, description, created_date,  + last_modified_date FROM product";
+                "category, image_url, price, stock, description, created_date,  + last_modified_date FROM product WHERE 1=1";
         Map<String, Object> map = new HashMap<>();
+        if (productCategory != null) {
+            sql += " AND category = :category"; //sql select 寫上 where 1=1一定要注意在AND前頭要加上空白鍵
+            map.put("category", productCategory.name());
+        }
+        if (search != null) {
+            sql += " AND product_name LIKE :search";
+            map.put("search", "%" + search + "%"); //在SQL當中模糊查詢
+        }
+
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
         return productList;
     }
