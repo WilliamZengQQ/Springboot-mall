@@ -21,12 +21,17 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getProducts(@RequestParam(required = false) ProductCategory productCategory,
-                                                     @RequestParam(required = false) String search){ //ResponseEntity裡面是一個裝著Product資訊的list
+                                                     @RequestParam(required = false) String search,
+                                                     @RequestParam(defaultValue = "created_date") String orderBy,
+                                                     @RequestParam(defaultValue = "dasc") String sort){ //ResponseEntity裡面是一個裝著Product資訊的list
                                                         //required = false代表是個可選的參數
-
+                                                        //sort決定由小排到大反之亦然
+                                                        //defaultValue = "created_date"是為了使用者一點選畫面就為最新的資訊（假設前端沒有傳遞資訊就是預設值created_date）
         ProductQueryParams productQueryParams = new ProductQueryParams();
         productQueryParams.setProductCategory(productCategory);
         productQueryParams.setSearch(search);
+        productQueryParams.setOrderBy(orderBy);
+        productQueryParams.setSort(sort);
 
         List<Product> productList = productService.getProducts(productQueryParams); //在getProducts當中傳入productCategory的值好讓Dao可以使用Where查詢對應的數值
 
