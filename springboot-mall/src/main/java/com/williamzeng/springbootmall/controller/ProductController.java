@@ -2,6 +2,7 @@ package com.williamzeng.springbootmall.controller;
 
 import com.mysql.cj.x.protobuf.Mysqlx;
 import com.williamzeng.springbootmall.constant.ProductCategory;
+import com.williamzeng.springbootmall.dto.ProductQueryParams;
 import com.williamzeng.springbootmall.dto.ProductRequest;
 import com.williamzeng.springbootmall.model.Product;
 import com.williamzeng.springbootmall.service.ProductService;
@@ -23,7 +24,11 @@ public class ProductController {
                                                      @RequestParam(required = false) String search){ //ResponseEntity裡面是一個裝著Product資訊的list
                                                         //required = false代表是個可選的參數
 
-        List<Product> productList = productService.getProducts(productCategory,search); //在getProducts當中傳入productCategory的值好讓Dao可以使用Where查詢對應的數值
+        ProductQueryParams productQueryParams = new ProductQueryParams();
+        productQueryParams.setProductCategory(productCategory);
+        productQueryParams.setSearch(search);
+
+        List<Product> productList = productService.getProducts(productQueryParams); //在getProducts當中傳入productCategory的值好讓Dao可以使用Where查詢對應的數值
 
         return ResponseEntity.status(HttpStatus.OK).body(productList);
 

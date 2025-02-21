@@ -2,6 +2,7 @@ package com.williamzeng.springbootmall.dao.impl;
 
 import com.williamzeng.springbootmall.constant.ProductCategory;
 import com.williamzeng.springbootmall.dao.ProductDao;
+import com.williamzeng.springbootmall.dto.ProductQueryParams;
 import com.williamzeng.springbootmall.dto.ProductRequest;
 import com.williamzeng.springbootmall.model.Product;
 import com.williamzeng.springbootmall.rowmapper.ProductRowMapper;
@@ -24,17 +25,17 @@ public class ProductDaoImpl implements ProductDao {
     NamedParameterJdbcTemplate namedParameterJdbcTemplate; //將NamedParameterJdbcTemplate注入進來引用這個類當中的function
 
     @Override
-    public List<Product> getProducts(ProductCategory productCategory,String search){
+    public List<Product> getProducts(ProductQueryParams productQueryParams){
         String sql = "SELECT product_id, product_name, " +
                 "category, image_url, price, stock, description, created_date,  + last_modified_date FROM product WHERE 1=1";
         Map<String, Object> map = new HashMap<>();
-        if (productCategory != null) {
+        if ( productQueryParams.getProductCategory()!= null) {
             sql += " AND category = :category"; //sql select 寫上 where 1=1一定要注意在AND前頭要加上空白鍵
-            map.put("category", productCategory.name());
+            map.put("category", productQueryParams.getProductCategory().name());
         }
-        if (search != null) {
+        if (productQueryParams.getSearch() != null) {
             sql += " AND product_name LIKE :search";
-            map.put("search", "%" + search + "%"); //在SQL當中模糊查詢
+            map.put("search", "%" + productQueryParams.getSearch() + "%"); //在SQL當中模糊查詢
         }
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());

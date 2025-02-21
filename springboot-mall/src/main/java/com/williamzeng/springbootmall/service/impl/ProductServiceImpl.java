@@ -1,7 +1,7 @@
 package com.williamzeng.springbootmall.service.impl;
 
-import com.williamzeng.springbootmall.constant.ProductCategory;
 import com.williamzeng.springbootmall.dao.ProductDao;
+import com.williamzeng.springbootmall.dto.ProductQueryParams;
 import com.williamzeng.springbootmall.dto.ProductRequest;
 import com.williamzeng.springbootmall.model.Product;
 import com.williamzeng.springbootmall.service.ProductService;
@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
 
 @Component
 public class ProductServiceImpl implements ProductService {
@@ -19,9 +20,9 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public List<Product> getProducts(ProductCategory productCategory,String search){
+    public List<Product> getProducts(ProductQueryParams productQueryParams){
 
-        return productDao.getProducts(productCategory,search);
+        return productDao.getProducts(productQueryParams);
     }
 
     @Override
