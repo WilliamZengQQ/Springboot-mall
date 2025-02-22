@@ -1,37 +1,54 @@
 package com.williamzeng.springbootmall.controller;
 
-import com.mysql.cj.x.protobuf.Mysqlx;
 import com.williamzeng.springbootmall.constant.ProductCategory;
 import com.williamzeng.springbootmall.dto.ProductQueryParams;
 import com.williamzeng.springbootmall.dto.ProductRequest;
 import com.williamzeng.springbootmall.model.Product;
 import com.williamzeng.springbootmall.service.ProductService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Validated //這樣才可以使用＠Max&@Min註解
 @RestController
 public class ProductController {
     @Autowired
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProducts(@RequestParam(required = false) ProductCategory productCategory,
-                                                     @RequestParam(required = false) String search,
-                                                     @RequestParam(defaultValue = "created_date") String orderBy,
-                                                     @RequestParam(defaultValue = "dasc") String sort){ //ResponseEntity裡面是一個裝著Product資訊的list
-                                                        //required = false代表是個可選的參數
-                                                        //sort決定由小排到大反之亦然
-                                                        //defaultValue = "created_date"是為了使用者一點選畫面就為最新的資訊（假設前端沒有傳遞資訊就是預設值created_date）
+    public ResponseEntity<List<Product>> getProducts(
+            //查詢條件filter
+            @RequestParam(required = false) ProductCategory productCategory,
+            @RequestParam(required = false) String search,
+
+            //sort
+            @RequestParam(defaultValue = "created_date") String orderBy,
+            @RequestParam(defaultValue = "DESC") String sort,
+
+            //pagination
+            @RequestParam(defaultValue = "5") @Max(1000) @Min(0) Integer limit,//這次要取幾筆的商品數據@Max&@Min限制前端傳回後端的數值範圍
+            @RequestParam(defaultValue = "0") @Min(0) Integer offset//要跳過多少筆數據
+    ){ //ResponseEntity裡面是一個裝著Product資訊的list
+                                                     //required = false代表是個可選的參數
+                                                     //sort決定由小排到大反之亦然
+                                                     //defaultValue = "created_date"是為了使用者一點選畫面就為最新的資訊（假設前端沒有傳遞資訊就是預設值created_date）
+
+
+
         ProductQueryParams productQueryParams = new ProductQueryParams();
         productQueryParams.setProductCategory(productCategory);
         productQueryParams.setSearch(search);
         productQueryParams.setOrderBy(orderBy);
         productQueryParams.setSort(sort);
+        productQueryParams.setLimit(limit);
+        productQueryParams.setOffset(offset);
 
         List<Product> productList = productService.getProducts(productQueryParams); //在getProducts當中傳入productCategory的值好讓Dao可以使用Where查詢對應的數值
 

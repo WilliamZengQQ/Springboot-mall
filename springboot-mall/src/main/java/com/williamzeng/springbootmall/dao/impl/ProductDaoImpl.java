@@ -1,6 +1,5 @@
 package com.williamzeng.springbootmall.dao.impl;
 
-import com.williamzeng.springbootmall.constant.ProductCategory;
 import com.williamzeng.springbootmall.dao.ProductDao;
 import com.williamzeng.springbootmall.dto.ProductQueryParams;
 import com.williamzeng.springbootmall.dto.ProductRequest;
@@ -29,16 +28,27 @@ public class ProductDaoImpl implements ProductDao {
         String sql = "SELECT product_id, product_name, " +
                 "category, image_url, price, stock, description, created_date,  + last_modified_date FROM product WHERE 1=1";
         Map<String, Object> map = new HashMap<>();
+
+        //查詢條件
         if ( productQueryParams.getProductCategory()!= null) {
             sql += " AND category = :category"; //sql select 寫上 where 1=1一定要注意在AND前頭要加上空白鍵
             map.put("category", productQueryParams.getProductCategory().name());
         }
+
         if (productQueryParams.getSearch() != null) {
             sql += " AND product_name LIKE :search";
             map.put("search", "%" + productQueryParams.getSearch() + "%"); //在SQL當中模糊查詢
         }
+
+        //排序
         sql += " ORDER BY " + productQueryParams.getOrderBy() + " " + productQueryParams.getSort();
         //在使用ORDER BY的語法後面只能用拼接到方是進行sql宣告
+
+        //分頁
+        sql +=  " LIMIT :limit OFFSET :offset";
+        map.put("limit",productQueryParams.getLimit());
+        map.put("offset",productQueryParams.getOffset());
+
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
         return productList;
     }
