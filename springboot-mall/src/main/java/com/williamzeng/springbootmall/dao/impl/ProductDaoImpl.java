@@ -23,22 +23,14 @@ public class ProductDaoImpl implements ProductDao {
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate; //將NamedParameterJdbcTemplate注入進來引用這個類當中的function
 
+
     @Override
     public List<Product> getProducts(ProductQueryParams productQueryParams){
         String sql = "SELECT product_id, product_name, " +
                 "category, image_url, price, stock, description, created_date,  + last_modified_date FROM product WHERE 1=1";
         Map<String, Object> map = new HashMap<>();
 
-        //查詢條件
-        if ( productQueryParams.getProductCategory()!= null) {
-            sql += " AND category = :category"; //sql select 寫上 where 1=1一定要注意在AND前頭要加上空白鍵
-            map.put("category", productQueryParams.getProductCategory().name());
-        }
-
-        if (productQueryParams.getSearch() != null) {
-            sql += " AND product_name LIKE :search";
-            map.put("search", "%" + productQueryParams.getSearch() + "%"); //在SQL當中模糊查詢
-        }
+        addFilteringSql(sql,map,productQueryParams);
 
         //排序
         sql += " ORDER BY " + productQueryParams.getOrderBy() + " " + productQueryParams.getSort();
@@ -57,16 +49,7 @@ public class ProductDaoImpl implements ProductDao {
     public Integer countProducts(ProductQueryParams productQueryParams) {
         String sql = "SELECT count(*) FROM product WHERE 1=1"; //取得product table當中商品數量
         Map<String, Object> map = new HashMap<>();
-        //查詢條件
-        if ( productQueryParams.getProductCategory()!= null) {
-            sql += " AND category = :category"; //sql select 寫上 where 1=1一定要注意在AND前頭要加上空白鍵
-            map.put("category", productQueryParams.getProductCategory().name());
-        }
-
-        if (productQueryParams.getSearch() != null) {
-            sql += " AND product_name LIKE :search";
-            map.put("search", "%" + productQueryParams.getSearch() + "%"); //在SQL當中模糊查詢
-        }
+        addFilteringSql(sql,map,productQueryParams);
 
         Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
         return total;
@@ -151,6 +134,20 @@ public class ProductDaoImpl implements ProductDao {
         namedParameterJdbcTemplate.update(sql, paramMap);
     }
 
+    //提煉程式（軟體的價值在於重複使用）
+    private String addFilteringSql(String sql,Map<String, Object> map,ProductQueryParams productQueryParams) {
+        //查詢條件
+        if ( productQueryParams.getProductCategory()!= null) {
+            sql += " AND category = :category"; //sql select 寫上 where 1=1一定要注意在AND前頭要加上空白鍵
+            map.put("category", productQueryParams.getProductCategory().name());
+        }
+
+        if (productQueryParams.getSearch() != null) {
+            sql += " AND product_name LIKE :search";
+            map.put("search", "%" + productQueryParams.getSearch() + "%"); //在SQL當中模糊查詢
+        }
+        return sql;
+    }
 
 
 
