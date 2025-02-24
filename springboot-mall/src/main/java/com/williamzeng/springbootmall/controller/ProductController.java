@@ -5,6 +5,7 @@ import com.williamzeng.springbootmall.dto.ProductQueryParams;
 import com.williamzeng.springbootmall.dto.ProductRequest;
 import com.williamzeng.springbootmall.model.Product;
 import com.williamzeng.springbootmall.service.ProductService;
+import com.williamzeng.springbootmall.util.Page;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -23,7 +24,7 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProducts(
+    public ResponseEntity<Page<Product>> getProducts(
             //查詢條件filter
             @RequestParam(required = false) ProductCategory productCategory,
             @RequestParam(required = false) String search,
@@ -42,7 +43,7 @@ public class ProductController {
 
 
 
-        ProductQueryParams productQueryParams = new ProductQueryParams();
+        ProductQueryParams productQueryParams = new ProductQueryParams(); //用以Product查詢的條件
         productQueryParams.setProductCategory(productCategory);
         productQueryParams.setSearch(search);
         productQueryParams.setOrderBy(orderBy);
@@ -50,9 +51,21 @@ public class ProductController {
         productQueryParams.setLimit(limit);
         productQueryParams.setOffset(offset);
 
+
+        //取得Product List
         List<Product> productList = productService.getProducts(productQueryParams); //在getProducts當中傳入productCategory的值好讓Dao可以使用Where查詢對應的數值
 
-        return ResponseEntity.status(HttpStatus.OK).body(productList);
+        //取得Product總比數
+        Integer total = productService.countProducts(productQueryParams); //productQueryParams把不同的商品查詢出來並加以計算
+
+        //分頁功能
+        Page<Product> page = new Page<>();
+        page.setLimit(limit);
+        page.setOffset(offset);
+        page.setTotal(total);//商品總數
+        page.setResult(productList);//將所查詢的數據放置Result回傳給前端
+
+        return ResponseEntity.status(HttpStatus.OK).body(page);
 
     }
 
