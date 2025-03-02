@@ -30,7 +30,7 @@ public class ProductDaoImpl implements ProductDao {
                 "category, image_url, price, stock, description, created_date,  + last_modified_date FROM product WHERE 1=1";
         Map<String, Object> map = new HashMap<>();
 
-        addFilteringSql(sql,map,productQueryParams);
+        sql=addFilteringSql(sql,map,productQueryParams);
 
         //排序
         sql += " ORDER BY " + productQueryParams.getOrderBy() + " " + productQueryParams.getSort();
@@ -49,7 +49,7 @@ public class ProductDaoImpl implements ProductDao {
     public Integer countProducts(ProductQueryParams productQueryParams) {
         String sql = "SELECT count(*) FROM product WHERE 1=1"; //取得product table當中商品數量
         Map<String, Object> map = new HashMap<>();
-        addFilteringSql(sql,map,productQueryParams);
+        sql=addFilteringSql(sql,map,productQueryParams);
 
         Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
         return total;

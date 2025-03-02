@@ -3,6 +3,8 @@ package com.williamzeng.springbootmall.dto;
 import com.williamzeng.springbootmall.constant.ProductCategory;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Date;
+
 
 public class ProductRequest{//下方定義前端要回傳的參數以及處理方法等
 
@@ -19,8 +21,8 @@ public class ProductRequest{//下方定義前端要回傳的參數以及處理�
     private Integer Stock;
 
     private String Description;
-//    private Date CreateDate;
-//    private Date LastModifiedDate; 因為為 mysql自動定義的毋需前端傳入
+    //private Date CreateDate;
+    //private Date LastModifiedDate; //因為為 mysql自動定義的毋需前端傳入
 
     public String getProductName() {
         return ProductName;

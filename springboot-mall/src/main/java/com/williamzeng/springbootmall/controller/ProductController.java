@@ -20,6 +20,7 @@ import java.util.List;
 @Validated //這樣才可以使用＠Max&@Min註解
 @RestController
 public class ProductController {
+
     @Autowired
     private ProductService productService;
 
