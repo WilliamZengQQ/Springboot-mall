@@ -71,4 +71,20 @@ public class UserDaoImpl implements UserDao {
         }
 
     }
+
+    @Override
+    public User getByEmail(String email) {
+        String sql = "SELECT user_id, email, password, created_date, last_modified_date"
+                + " FROM user WHERE email = :email";
+        Map<String, Object> params = new HashMap<>();
+        params.put("email", email);
+        List<User> userList = namedParameterJdbcTemplate.query(sql,params,new UserRowMap());
+        //如果在資料庫當中有存在對應的email的話就會將這個user的值查出來並回傳
+        if (userList.size()>0){
+            return userList.get(0);
+        }
+        else {
+            return null;
+        }
+    }
 }
