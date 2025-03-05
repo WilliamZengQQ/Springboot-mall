@@ -1,6 +1,7 @@
 package com.williamzeng.springbootmall.service.impl;
 
 import com.williamzeng.springbootmall.dao.UserDao;
+import com.williamzeng.springbootmall.dto.UserLoginRequest;
 import com.williamzeng.springbootmall.dto.UserRegisterRequest;
 import com.williamzeng.springbootmall.model.User;
 import com.williamzeng.springbootmall.service.UserService;
@@ -50,5 +51,26 @@ public class UserServiceImpl implements UserService {
     public User getUserById(Integer userId) {
 
         return userDao.getUserById(userId);
+    }
+
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
+        User user = userDao.getByEmail(userLoginRequest.getEmail());
+
+        if (user == null) {
+            logger.warn("該 email{} 尚未註冊", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        /*
+        在Java當中比較字串一定要使用.equals()不可以使用==
+         */
+        if (user.getPassword().equals(userLoginRequest.getPassword())) {
+            return user;
+        }
+        else {
+            logger.warn("該 email{} 密碼不正確", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
     }
 }
