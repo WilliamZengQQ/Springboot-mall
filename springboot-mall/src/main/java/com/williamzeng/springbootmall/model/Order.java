@@ -1,6 +1,7 @@
 package com.williamzeng.springbootmall.model;
 
 import java.util.Date;
+import java.util.List;
 
 //與資料庫當中的Order的table中的參數一一對應
 public class Order {
@@ -10,6 +11,15 @@ public class Order {
     private Integer totalAmount;
     private Date createDate;
     private Date LastModifiedDate;
+    private List<OrderItem> orderItemList;
+
+    public List<OrderItem> getOrderItemList() {
+        return orderItemList;
+    }
+
+    public void setOrderItemList(List<OrderItem> orderItemList) {
+        this.orderItemList = orderItemList;
+    }
 
     public Integer getOrderId() {
         return orderId;

@@ -24,7 +24,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public Integer createOrder(Integer userId, CreateOrderRequest createOrderRequest){
+    public Integer createOrder(Integer userId, CreateOrderRequest createOrderRequest) {
 
         //計算總共使用者消費資訊
         int totalAmount = 0;
@@ -35,12 +35,12 @@ public class OrderServiceImpl implements OrderService {
         :（冒號）可以解釋為 「in」，即「for each byItem in createOrderRequest.getByItemList()」。
         迴圈每次執行時，byItem 會指向 getByItemList() 中的下一個元素，直到遍歷完整個集合。
          */
-        for(ByItem byItem : createOrderRequest.getByItemList()){
+        for (ByItem byItem : createOrderRequest.getByItemList()) {
             Product product = productDao.getProductById(byItem.getProductId());
 
             //計算總價格
             int amount = byItem.getQuantity() * product.getPrice();
-            totalAmount = totalAmount+amount;
+            totalAmount = totalAmount + amount;
 
             //轉換ByItem to OrderItem
             OrderItem orderItem = new OrderItem();
@@ -52,9 +52,20 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //創建訂單
-        Integer orderId = orderDao.createOrder(userId,totalAmount);
-        orderDao.createOrderItems(orderId,orderItemList);
+        Integer orderId = orderDao.createOrder(userId, totalAmount);
+        orderDao.createOrderItems(orderId, orderItemList);
 
         return orderId;
+    }
+
+    @Override
+    public Order getOrdderById(Integer orderId) {
+
+        //分別從資料庫當中取得這兩張table的數據
+        Order order = orderDao.getOrderById(orderId);
+        List<OrderItem> orderItemList = orderDao.getOrderItemsByOrderId(orderId);
+        //合併上方數據
+        order.setOrderItemList(orderItemList);
+        return order;
     }
 }
