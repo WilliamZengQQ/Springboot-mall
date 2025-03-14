@@ -2,29 +2,48 @@ package com.williamzeng.springbootmall.service.impl;
 
 import com.williamzeng.springbootmall.dao.OrderDao;
 import com.williamzeng.springbootmall.dao.ProductDao;
+import com.williamzeng.springbootmall.dao.UserDao;
+import com.williamzeng.springbootmall.dao.impl.UserDaoImpl;
 import com.williamzeng.springbootmall.dto.ByItem;
 import com.williamzeng.springbootmall.dto.CreateOrderRequest;
 import com.williamzeng.springbootmall.model.Order;
 import com.williamzeng.springbootmall.model.OrderItem;
 import com.williamzeng.springbootmall.model.Product;
+import com.williamzeng.springbootmall.model.User;
 import com.williamzeng.springbootmall.service.OrderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class OrderServiceImpl implements OrderService {
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
     @Autowired
     private OrderDao orderDao;
     @Autowired
     private ProductDao productDao;
 
+    @Autowired
+    private UserDao userDao;
+
     @Transactional
     @Override
     public Integer createOrder(Integer userId, CreateOrderRequest createOrderRequest) {
+
+        //檢查User是否存在
+        User user = userDao.getUserById(userId);
+
+        if (user == null){
+            log.warn(" 該User_id {} 不存在 ",userId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
 
         //計算總共使用者消費資訊
         int totalAmount = 0;
@@ -37,6 +56,21 @@ public class OrderServiceImpl implements OrderService {
          */
         for (ByItem byItem : createOrderRequest.getByItemList()) {
             Product product = productDao.getProductById(byItem.getProductId());
+
+            //檢查product是否存在、庫存是否足夠
+            if (product == null){
+                log.warn("商品{}不存在",byItem.getProductId());
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            } else if (product.getStock() < byItem.getQuantity()) {
+
+                log.warn("商品{}庫存不足，無法購買。剩餘庫存{}，欲購買數量{}",
+                        byItem.getProductId(),product.getStock(),byItem.getQuantity());
+
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
+
+            //扣除商品庫存
+            productDao.updateStock(product.getProductId(),product.getStock()-byItem.getQuantity());
 
             //計算總價格
             int amount = byItem.getQuantity() * product.getPrice();
@@ -59,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order getOrdderById(Integer orderId) {
+    public Order getOrderById(Integer orderId) {
 
         //分別從資料庫當中取得這兩張table的數據
         Order order = orderDao.getOrderById(orderId);

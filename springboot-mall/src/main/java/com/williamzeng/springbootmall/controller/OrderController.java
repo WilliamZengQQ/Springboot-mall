@@ -23,7 +23,7 @@ public class OrderController {
     {
         Integer orderId =  orderService.createOrder(userId,createOrderRequest);
 
-        Order order = orderService.getOrdderById(orderId); //嘗試使用orderId將database的訂單資料提取出來
+        Order order = orderService.getOrderById(orderId); //嘗試使用orderId將database的訂單資料提取出來
 
         return ResponseEntity.status(HttpStatus.OK).body(order);
     }
