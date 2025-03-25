@@ -6,6 +6,7 @@ import com.williamzeng.springbootmall.dao.UserDao;
 import com.williamzeng.springbootmall.dao.impl.UserDaoImpl;
 import com.williamzeng.springbootmall.dto.ByItem;
 import com.williamzeng.springbootmall.dto.CreateOrderRequest;
+import com.williamzeng.springbootmall.dto.OrderQueryParams;
 import com.williamzeng.springbootmall.model.Order;
 import com.williamzeng.springbootmall.model.OrderItem;
 import com.williamzeng.springbootmall.model.Product;
@@ -101,5 +102,28 @@ public class OrderServiceImpl implements OrderService {
         //合併上方數據
         order.setOrderItemList(orderItemList);
         return order;
+    }
+
+    @Override
+    /*
+    orderDao.getOrders(orderQueryParams) 透過 orderDao（DAO，資料存取物件）從資料庫中獲取 Order 物件列表。
+    OrderQueryParams 是查詢參數，可能包含篩選條件，如訂單日期、使用者 ID 等。
+     */
+    public List<Order> getOrder(OrderQueryParams orderQueryParams) {
+        List<Order> orderList = orderDao.getOrders(orderQueryParams);
+
+        for (Order order:orderList){
+
+            //我們都去取得他的 order items，然後把這個 orderItemList，去放在每一個 order 的底下
+            List<OrderItem> orderItemList = orderDao.getOrderItemsByOrderId((order.getOrderId()));
+            order.setOrderItemList(orderItemList);
+        }
+
+        return orderList;
+    }
+
+    @Override
+    public Integer countOrder(OrderQueryParams orderQueryParams) {
+        return orderDao.countOrder(orderQueryParams);
     }
 }

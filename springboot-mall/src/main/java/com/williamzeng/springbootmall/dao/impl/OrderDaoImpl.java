@@ -1,6 +1,7 @@
 package com.williamzeng.springbootmall.dao.impl;
 
 import com.williamzeng.springbootmall.dao.OrderDao;
+import com.williamzeng.springbootmall.dto.OrderQueryParams;
 import com.williamzeng.springbootmall.model.Order;
 import com.williamzeng.springbootmall.model.OrderItem;
 import com.williamzeng.springbootmall.rowmapper.OrderItemListRowMapper;
@@ -112,5 +113,50 @@ public class OrderDaoImpl implements OrderDao {
         map.put("orderId",orderId);
         List<OrderItem> orderItemList = namedParameterJdbcTemplate.query(sql,map,new OrderItemListRowMapper());
         return orderItemList;
+    }
+
+    @Override
+    public Integer countOrder(OrderQueryParams orderQueryParams) {
+        String sql = "SELECT count(*) FROM `order` WHERE 1=1";
+
+        Map<String,Object> map = new HashMap<>();
+
+        //查詢條件拼接
+        sql = addFilteringSql(sql,map,orderQueryParams);
+        Integer total = namedParameterJdbcTemplate.queryForObject(sql,map,Integer.class);
+
+        return total;
+
+    }
+
+    @Override
+    public List<Order> getOrders(OrderQueryParams orderQueryParams) {
+
+        String sql = "SELECT order_id, user_id, created_date, last_modified_date, total_amount FROM `order` WHERE 1=1";
+        Map<String,Object> map = new HashMap<>();
+
+        //查詢條件拼接
+        sql = addFilteringSql(sql,map,orderQueryParams);
+
+        //排序
+        sql = sql + " ORDER BY created_date DESC ";
+
+        //分頁
+        sql = sql + " LIMIT :limit OFFSET :offset ";
+
+        map.put("limit",orderQueryParams.getLimit());
+        map.put("offset",orderQueryParams.getOffset());
+
+        List<Order> orderList = namedParameterJdbcTemplate.query(sql,map,new OrderRowMapper());
+
+        return orderList;
+    }
+
+    private String addFilteringSql(String sql,Map<String,Object> map,OrderQueryParams orderQueryParams){
+        if (orderQueryParams != null){
+            sql = sql+ " AND user_id = :userId";
+            map.put("userId",orderQueryParams.getUserId());
+        }
+        return sql;
     }
 }
